@@ -1,0 +1,7 @@
+.DS_Store
+pkg
+bin
+gob.exe
+vendor
+Gopkg.lock
+Gopkg.toml

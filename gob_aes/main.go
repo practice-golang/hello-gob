@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
 )
 
 type Person struct {
@@ -92,11 +93,15 @@ func loadGOB(fileName string, key []byte, data interface{}) error {
 }
 
 func main() {
-	person := Person{Name: "Alice", Age: 30}
+	persons := []Person{
+		{Name: "James", Age: 32},
+		{Name: "Alice", Age: 30},
+		{Name: "John", Age: 12},
+	}
 	fileName := "person.gob"
 	key := []byte("0123456789abcdef0123456789abcdef") // AES key (32byte = 256bit)
 
-	err := saveGOB(fileName, person, key)
+	err := saveGOB(fileName, persons, key)
 	if err != nil {
 		fmt.Println("Error saving struct:", err)
 		return
@@ -104,12 +109,18 @@ func main() {
 
 	fmt.Println("Struct saved to", fileName)
 
-	var decodedPerson Person
-	err = loadGOB(fileName, key, &decodedPerson)
+	var decodedPersons []Person
+	err = loadGOB(fileName, key, &decodedPersons)
 	if err != nil {
 		fmt.Println("Error loading struct:", err)
 		return
 	}
 
-	fmt.Println("Struct loaded as:", decodedPerson)
+	fmt.Println("Struct loaded as:", decodedPersons)
+
+	// Find index of John
+	idx := slices.IndexFunc(decodedPersons, func(p Person) bool {
+		return p.Name == "John"
+	})
+	fmt.Println("idx of John's data:", idx)
 }

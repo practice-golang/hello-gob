@@ -39,30 +39,30 @@ func loadGOB(fileName string, data interface{}) error {
 }
 
 func main() {
-	bookEncode := []Book{
+	booksOrig := []Book{
 		{Title: "Holy bible genesis", Author: "Mosses"},
 		{Title: "Sutta nipāta", Author: "Buddha"},
 		{Title: "القرآن(Qur'an)", Author: "محمد(Muhammad)"},
 	}
 	fileName := "book.gob"
 
-	if err := saveGOB(fileName, bookEncode); err != nil {
+	if err := saveGOB(fileName, booksOrig); err != nil {
 		fmt.Println("Error saving struct:", err)
 		return
 	}
 
 	fmt.Println("Struct saved to", fileName)
 
-	var bookDecode []Book
-	if err := loadGOB(fileName, &bookDecode); err != nil {
+	var booksDecode []Book
+	if err := loadGOB(fileName, &booksDecode); err != nil {
 		fmt.Println("Error loading struct:", err)
 		return
 	}
 
-	fmt.Println("Struct loaded as:", bookDecode)
+	fmt.Println("Struct loaded as:", booksDecode)
 
 	// Find index of Buddha
-	idx := slices.IndexFunc(bookDecode, func(p Book) bool {
+	idx := slices.IndexFunc(booksDecode, func(p Book) bool {
 		return p.Author == "Buddha"
 	})
 	fmt.Println("idx of Buddha's data:", idx)

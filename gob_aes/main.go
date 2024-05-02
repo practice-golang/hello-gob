@@ -60,7 +60,7 @@ func saveGOB(fileName string, data interface{}, key []byte) error {
 }
 
 func loadGOB(fileName string, key []byte, data interface{}) error {
-	encryptedData := make([]byte, 4096)
+	// encryptedData := make([]byte, 4096)
 
 	file, err := os.Open(fileName)
 	if err != nil {
@@ -68,9 +68,19 @@ func loadGOB(fileName string, key []byte, data interface{}) error {
 	}
 	defer file.Close()
 
-	_, err = file.Read(encryptedData)
-	if err != nil && err != io.EOF {
-		return err
+	// _, err = file.Read(encryptedData)
+	// if err != nil && err != io.EOF {
+	// 	return err
+	// }
+	fileInfo, err := file.Stat()
+	if err != nil {
+		return fmt.Errorf("loadHostData/Stat: %s", err)
+	}
+
+	encryptedData := make([]byte, fileInfo.Size())
+	_, err = io.ReadFull(file, encryptedData)
+	if err != nil {
+		return fmt.Errorf("loadHostData/ReadFull: %s", err)
 	}
 
 	block, err := aes.NewCipher(key)
@@ -82,8 +92,8 @@ func loadGOB(fileName string, key []byte, data interface{}) error {
 
 	encryptedData = encryptedData[aes.BlockSize:]
 
-	reader := &cipher.StreamReader{S: stream, R: bytes.NewReader(encryptedData)}
-	decoder := gob.NewDecoder(reader)
+	reader := cipher.StreamReader{S: stream, R: bytes.NewReader(encryptedData)}
+	decoder := gob.NewDecoder(&reader)
 	err = decoder.Decode(data)
 	if err != nil {
 		return err
